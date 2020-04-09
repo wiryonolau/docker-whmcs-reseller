@@ -3,3 +3,4 @@
 *.bak
 *.dist
 *.dist.*
+docker-compose.yml
