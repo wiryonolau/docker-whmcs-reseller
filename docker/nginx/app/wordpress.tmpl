@@ -1,0 +1,42 @@
+upstream wordpress {
+    server wordpress:9000;
+}
+
+server {
+    listen 443 ssl;
+    
+    server_name {{ default .Env.WORDPRESS_SERVER_NAME "wordpress.dev" }};
+    ssl_certificate {{ default .Env.WORDPRESS_CERT_FILE }};
+    ssl_certificate_key {{ default .Env.WORDPRESS_CERT_KEY_FILE }};
+
+    root /var/www/html;
+    index index.php;
+
+    location = /favicon.ico {
+        log_not_found off;
+        access_log off;
+    }
+
+    location = /robots.txt {
+        allow all;
+        log_not_found off;
+        access_log off;
+    }
+
+    location / {
+        try_files $uri $uri/ /index.php$is_args$args;
+    }
+
+    location ~ \.php$ {
+        include fastcgi_params;
+        fastcgi_intercept_errors on;
+        fastcgi_pass wordpress;
+        fastcgi_param  SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    }
+
+    location ~* \.(js|css|png|jpg|jpeg|gif|svg|ico)$ {
+        root /srv/wordpress;
+        expires max;
+        log_not_found off;
+    }
+}

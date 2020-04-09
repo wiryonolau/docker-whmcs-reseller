@@ -1,0 +1,89 @@
+version: "3.2"
+services:
+    nginx:
+        build:
+            context: ./docker/nginx
+        image: nginx:whmcs-reseller
+        environment:
+            - CERT_PATH=/etc/nginx/certs
+            - WORDPRESS_SERVER_NAME=wordpress.test
+            - WORDPRESS_CERT_PATH=
+            - WORDPRESS_CERT_KEY_PATH=
+            - WHMCS_SERVER_NAME=whmcs.test
+            - WHMCS_CERT_PATH=
+            - WHMCS_CERT_KEY_PATH=
+        ports:
+            - 80:80
+            - 443:443
+        volumes:
+            - ./wordpress:/srv/wordpress:ro
+            - ./whmcs_data:/srv/whmcs:ro
+            - /usr/share/zoneinfo/Asia/Jakarta:/etc/localtime
+        restart: unless-stopped
+        depends_on:
+            - whmcs
+            - wordpress
+    whmcs:
+        build:
+            context: ./docker/php
+        image: php:7.2-whmcs-reseller
+        environment:
+            - USERID=${USERID}
+            - GROUPID=${GROUPID}
+        volumes:
+            - ./whmcs_data:/var/www/whmcs
+            - /usr/share/zoneinfo/Asia/Jakarta:/etc/localtime
+        restart: unless-stopped
+        depends_on:
+            - mysql
+    wordpress:
+        build:
+            context: ./docker/php
+        image: php:7.2-whmcs-reseller
+        environment:
+            - USERID=${USERID}
+            - GROUPID=${GROUPID}
+        volumes:
+            - ./wordpress:/var/www/html
+            - /usr/share/zoneinfo/Asia/Jakarta:/etc/localtime
+        restart: unless-stopped
+        depends_on:
+            - mysql
+    cron:
+        build:
+            context: ./docker/php
+        image: php:7.2-whmcs-reseller
+        environment:
+            - USERID=${USERID}
+            - GROUPID=${GROUPID}
+        volumes:
+            - ./whmcs_data:/var/www/whmcs
+            - ./wordpress:/var/www/html
+            - ./cron:/cron
+            - /usr/share/zoneinfo/Asia/Jakarta:/etc/localtime
+        restart: unless-stopped
+        command:
+            - start-cron
+        depends_on:
+            - mysql
+    mysql:
+        image: mysql:5.7
+        user: ${USERID}:${GROUPID}
+        environment:
+            - MYSQL_ROOT_PASSWORD=VKRJY8TmV2XzfTSu
+            - MYSQL_USER=
+            - MYSQL_PASSWORD=
+        volumes:
+            - ./init_db:/docker-entrypoint-initdb.d
+            - ./mysql_data:/var/lib/mysql
+            - /usr/share/zoneinfo/Asia/Jakarta:/etc/localtime
+        healthcheck:
+            test:
+                - CMD
+                - mysqladmin
+                - ping
+                - -h
+                - localhost
+            timeout: 5s
+            retries: 10
+        restart: unless-stopped
