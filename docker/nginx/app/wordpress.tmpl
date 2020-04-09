@@ -6,8 +6,8 @@ server {
     listen 443 ssl;
     
     server_name {{ default .Env.WORDPRESS_SERVER_NAME "wordpress.dev" }};
-    ssl_certificate {{ default .Env.WORDPRESS_CERT_FILE }};
-    ssl_certificate_key {{ default .Env.WORDPRESS_CERT_KEY_FILE }};
+    ssl_certificate {{ default .Env.WORDPRESS_CERT_PATH }};
+    ssl_certificate_key {{ default .Env.WORDPRESS_CERT_KEY_PATH }};
 
     root /var/www/html;
     index index.php;
