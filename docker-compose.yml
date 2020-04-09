@@ -18,6 +18,7 @@ services:
         volumes:
             - ./wordpress:/srv/wordpress:ro
             - ./whmcs_data:/srv/whmcs:ro
+            - ./certs:/etc/nginx/certs:ro
             - /usr/share/zoneinfo/Asia/Jakarta:/etc/localtime
         restart: unless-stopped
         depends_on:

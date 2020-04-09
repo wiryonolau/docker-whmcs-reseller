@@ -3,10 +3,10 @@ FROM nginx:stable
 ARG DOCKERIZE_VERSION=v0.6.1
 
 ENV CERT_PATH=/etc/nginx/certs \
-    WORDPRESS_SERVER_NAME=wordpress.dev \
+    WORDPRESS_SERVER_NAME=wordpress.test \
     WORDPRESS_CERT_PATH= \
     WORDPRESS_CERT_KEY_PATH= \
-    WHMCS_SERVER_NAME=whmcs.dev \
+    WHMCS_SERVER_NAME=whmcs.test \
     WHMCS_CERT_PATH= \
     WHMCS_CERT_KEY_PATH=
 
