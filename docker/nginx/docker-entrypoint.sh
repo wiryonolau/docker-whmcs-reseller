@@ -1,8 +1,8 @@
 #!/bin/bash
 mkdir -p ${CERT_PATH}
 
-if [ ! -f "${WORDPRESS_CERT_FILE}" ]; then
-    if [ ! -w "${CERT_PATH}" ]; then 
+if [[ ! -f "${WORDPRESS_CERT_PATH}" ]]; then
+    if [[ ! -w "${CERT_PATH}" ]]; then 
         WORDPRESS_CERT_PATH=/tmp
     else
         WORDPRESS_CERT_PATH=${CERT_PATH}
@@ -17,8 +17,8 @@ if [ ! -f "${WORDPRESS_CERT_FILE}" ]; then
     export WORDPRESS_CERT_KEY_FILE="${WORDPRESS_CERT_PATH}/wp.key"
 fi
 
-if [ ! -f "${WHMCS_CERT_FILE}" ]; then
-    if [ ! -w "${CERT_PATH}" ]; then 
+if [[ ! -f "${WHMCS_CERT_PATH}" ]]; then
+    if [[ ! -w "${CERT_PATH}" ]]; then 
         WHMCS_CERT_PATH=/tmp
     else
         WHMCS_CERT_PATH=${CERT_PATH}
