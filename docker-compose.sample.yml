@@ -100,7 +100,7 @@ services:
             retries: 10
         restart: unless-stopped
 
-network:
+networks:
     reseller:
         driver: bridge
         ipam:
