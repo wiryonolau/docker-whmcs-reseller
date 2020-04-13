@@ -4,6 +4,8 @@ services:
         build:
             context: ./docker/nginx
         image: nginx:whmcs-reseller
+        networks:
+            - reseller
         environment:
             - CERT_PATH=/etc/nginx/certs
             - WORDPRESS_SERVER_NAME=wordpress.test
@@ -12,6 +14,7 @@ services:
             - WHMCS_SERVER_NAME=whmcs.test
             - WHMCS_CERT_PATH=
             - WHMCS_CERT_KEY_PATH=
+            - WHMCS_REAL_IP=172.16.254.0/24
         ports:
             - 80:80
             - 443:443
@@ -28,6 +31,8 @@ services:
         build:
             context: ./docker/php
         image: php:7.2-whmcs-reseller
+        networks:
+            - reseller
         environment:
             - USERID=${USERID}
             - GROUPID=${GROUPID}
@@ -41,6 +46,8 @@ services:
         build:
             context: ./docker/php
         image: php:7.2-whmcs-reseller
+        networks:
+            - reseller
         environment:
             - USERID=${USERID}
             - GROUPID=${GROUPID}
@@ -54,6 +61,8 @@ services:
         build:
             context: ./docker/php
         image: php:7.2-whmcs-reseller
+        networks:
+            - reseller
         environment:
             - USERID=${USERID}
             - GROUPID=${GROUPID}
@@ -70,6 +79,8 @@ services:
     mysql:
         image: mysql:5.7
         user: ${USERID}:${GROUPID}
+        networks:
+            - reseller
         environment:
             - MYSQL_ROOT_PASSWORD=VKRJY8TmV2XzfTSu
             - MYSQL_USER=
@@ -88,3 +99,11 @@ services:
             timeout: 5s
             retries: 10
         restart: unless-stopped
+
+network:
+    reseller:
+        driver: bridge
+        ipam:
+            driver: default
+            config: 
+                - subnet: 172.16.254.0/24

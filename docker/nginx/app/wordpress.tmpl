@@ -31,7 +31,8 @@ server {
         include fastcgi_params;
         fastcgi_intercept_errors on;
         fastcgi_pass wordpress;
-        fastcgi_param  SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param HTTPS on;
     }
 
     location ~* \.(js|css|png|jpg|jpeg|gif|svg|ico)$ {

@@ -33,6 +33,7 @@ nginx:
     WHMCS_SERVER_NAME=whmcs.dev             # Whmcs root url
     WHMCS_CERT_PATH=                        # Whmcs certificate path
     WHMCS_CERT_KEY_PATH=                    # Whmcs certificate key path
+    WHMCS_REAL_IP=                          # Container netowrk ip subnet use by nginx
 whmcs:
     USERID=                                 # Run user , pass as current user from Makefile
     GROUPID=                                # Run group , pass as current user group from Makefile
