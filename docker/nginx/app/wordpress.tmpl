@@ -10,7 +10,20 @@ server {
     ssl_certificate_key {{ default .Env.WORDPRESS_CERT_KEY_PATH }};
 
     root /var/www/html;
-    index index.php;
+    index index.php index.html;
+
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
+
+    set_real_ip_from  {{ default .Env.SERVER_REAL_IP "172.17.0.0/16" }};
+    real_ip_header    X-Forwarded-For;
+    real_ip_recursive on;
+
+    add_header X-Frame-Options "SAMEORIGIN";
+    add_header X-XSS-Protection "1; mode=block";
+    add_header X-Content-Type-Options "nosniff";
 
     location = /favicon.ico {
         log_not_found off;
@@ -24,15 +37,18 @@ server {
     }
 
     location / {
-        try_files $uri $uri/ /index.php$is_args$args;
+        try_files $uri $uri/ $uri/index.php$is_args$args;
     }
 
     location ~ \.php$ {
-        include fastcgi_params;
+        fastcgi_index   index.php;
+        fastcgi_pass    wordpress;
+        include         fastcgi_params;
+        fastcgi_param   SCRIPT_FILENAME    $document_root$fastcgi_script_name;
+        fastcgi_param   SCRIPT_NAME        $fastcgi_script_name;
+        fastcgi_param   HTTPS              on;
+        fastcgi_keep_conn on;
         fastcgi_intercept_errors on;
-        fastcgi_pass wordpress;
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-        fastcgi_param HTTPS on;
     }
 
     location ~* \.(js|css|png|jpg|jpeg|gif|svg|ico)$ {

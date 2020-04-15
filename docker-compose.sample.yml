@@ -14,7 +14,7 @@ services:
             - WHMCS_SERVER_NAME=whmcs.test
             - WHMCS_CERT_PATH=
             - WHMCS_CERT_KEY_PATH=
-            - WHMCS_REAL_IP=172.16.254.0/24
+            - SERVER_REAL_IP=172.16.254.0/24
         ports:
             - 80:80
             - 443:443
