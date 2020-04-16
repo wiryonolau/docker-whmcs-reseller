@@ -8,6 +8,7 @@
 # - Ticket Importing using POP3 Import every 5 minutes
 #
 # m h d m w                         command
+PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/bin
 MAILTO=""
 */5 * * * *                         php -q /var/www/whmcs/crons/cron.php skip --TicketEscalations --AutoSuspensions >/dev/null 2>&1
 0 9,10,11,12,13,14,15,16 * * 1-5    php -q /var/www/whmcs/crons/cron.php do --TicketEscalations >/dev/null 2>&1

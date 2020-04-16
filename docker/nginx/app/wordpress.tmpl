@@ -40,6 +40,10 @@ server {
         try_files $uri $uri/ $uri/index.php$is_args$args;
     }
 
+    location /wp-admin/ {
+        try_files $uri $uri/ /wp-admin/index.php$is_args$args;
+    }
+
     location ~ \.php$ {
         fastcgi_index   index.php;
         fastcgi_pass    wordpress;
@@ -51,9 +55,17 @@ server {
         fastcgi_intercept_errors on;
     }
 
-    location ~* \.(js|css|png|jpg|jpeg|gif|svg|ico)$ {
+    location ~* \.(css|js|png|jpe?g|gif|ico|woff|otf|ttf|eot|svg|txt|pdf|docx?|xlsx?)$ {
         root /srv/wordpress;
         expires max;
-        log_not_found off;
+        access_log off;
+        add_header Pragma public;
+        add_header Cache-Control "public, must-revalidate, proxy-revalidate";
+        add_header Vary "Accept-Encoding";
     }
+
+    location ~ /(\.|bower.json|composer.json|LICENSE|package.json|gulpfile.js) {
+        deny all;
+    }
+
 }

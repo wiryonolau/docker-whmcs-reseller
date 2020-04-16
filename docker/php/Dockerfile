@@ -44,6 +44,7 @@ RUN docker-php-ext-configure imap --with-kerberos --with-imap-ssl \
     && docker-php-ext-install zip \
     && docker-php-ext-install ldap \
     && docker-php-ext-install iconv \
+    && docker-php-ext-install soap \
     && docker-php-ext-enable memcached \
     && apt-get purge -y libc-client-dev libkrb5-dev libicu-dev g++ libcurl4-gnutls-dev libxml2-dev libldap2-dev \  
     && apt-get -y --purge autoremove \
