@@ -6,7 +6,7 @@ Provide base structure to run both whmcs and wordpress for marketing using this 
 - PHP 7.2 loaded with ioncube
 - MySQL 5.7
 
-Wordpress and WHMCS project are not included.  
+Wordpress and WHMCS project are not included, download and extract it to the app folder.  
 Any plugin for both software also not included.
 
 If cert_path for whmcs or wordpress not define, a self sign certificate will be created under server_name.  
@@ -20,7 +20,6 @@ After setup your environment, run the service using
 make up     # To Start
 make down   # To Stop
 ```
-
 
 ## Environment Variable ##
 
@@ -47,6 +46,8 @@ mysql:
     MYSQL_ROOT_PASSWORD=
     MYSQL_USER=
     MYSQL_PASSWORD=    
+
+
 ```
 
 ## Volume ##

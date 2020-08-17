@@ -1,4 +1,5 @@
 version: "3.2"
+
 services:
     nginx:
         build:
@@ -16,12 +17,12 @@ services:
             - WHMCS_CERT_KEY_PATH=
             - SERVER_REAL_IP=172.16.254.0/24
         ports:
-            - 80:80
-            - 443:443
+            - "80:80"
+            - "443:443"
         volumes:
-            - ./wordpress:/srv/wordpress:ro
-            - ./whmcs_data:/srv/whmcs:ro
-            - ./certs:/etc/nginx/certs:ro
+            - ./app/wordpress:/srv/wordpress:ro
+            - ./app/whmcs_data:/srv/whmcs:ro
+            - ./app/certs:/etc/nginx/certs:ro
             - /usr/share/zoneinfo/Asia/Jakarta:/etc/localtime
         restart: unless-stopped
         depends_on:
@@ -34,10 +35,10 @@ services:
         networks:
             - reseller
         environment:
-            - USERID=${USERID}
-            - GROUPID=${GROUPID}
+            - USERID=${USERID:-1000}
+            - GROUPID=${GROUPID:-1000}
         volumes:
-            - ./whmcs_data:/var/www/whmcs
+            - ./app/whmcs_data:/var/www/whmcs
             - /usr/share/zoneinfo/Asia/Jakarta:/etc/localtime
         restart: unless-stopped
         depends_on:
@@ -49,10 +50,10 @@ services:
         networks:
             - reseller
         environment:
-            - USERID=${USERID}
-            - GROUPID=${GROUPID}
+            - USERID=${USERID:-1000}
+            - GROUPID=${GROUPID:-1000}
         volumes:
-            - ./wordpress:/var/www/html
+            - ./app/wordpress:/var/www/html
             - /usr/share/zoneinfo/Asia/Jakarta:/etc/localtime
         restart: unless-stopped
         depends_on:
@@ -64,12 +65,12 @@ services:
         networks:
             - reseller
         environment:
-            - USERID=${USERID}
-            - GROUPID=${GROUPID}
+            - USERID=${USERID:-1000}
+            - GROUPID=${GROUPID:-1000}
         volumes:
-            - ./whmcs_data:/var/www/whmcs
-            - ./wordpress:/var/www/html
-            - ./cron:/cron
+            - ./app/whmcs_data:/var/www/whmcs
+            - ./app/wordpress:/var/www/html
+            - ./app/cron:/cron
             - /usr/share/zoneinfo/Asia/Jakarta:/etc/localtime
         restart: unless-stopped
         command:
@@ -78,27 +79,46 @@ services:
             - mysql
     mysql:
         image: mysql:5.7
-        user: ${USERID}:${GROUPID}
+        user: ${USERID:-1000}:${GROUPID:-1000}
         networks:
             - reseller
         environment:
-            - MYSQL_ROOT_PASSWORD=VKRJY8TmV2XzfTSu
-            - MYSQL_USER=
-            - MYSQL_PASSWORD=
+            - MYSQL_ROOT_PASSWORD=888888
+            - MYSQL_USER=test
+            - MYSQL_PASSWORD=888888
         volumes:
             - ./init_db:/docker-entrypoint-initdb.d
             - ./mysql_data:/var/lib/mysql
             - /usr/share/zoneinfo/Asia/Jakarta:/etc/localtime
         healthcheck:
             test:
-                - CMD
-                - mysqladmin
-                - ping
-                - -h
-                - localhost
+                - "CMD"
+                - "mysqladmin"
+                - "ping"
+                - "--user=test"
+                - "--password=888888"
+                - "-h"
+                - "localhost"
             timeout: 5s
             retries: 10
         restart: unless-stopped
+    smtp:
+        image: namshi/smtp
+        hostname: mail.whmcs.com
+        restart: unless-stopped
+        networks:
+            reseller:
+                ipv4_address: 172.16.254.8
+    sftp:
+        image: atmoz/sftp
+        networks:
+            - reseller
+        volumes:
+            - ./app:/home/${USERID:-1000}/upload
+        ports:
+            - "2222:22"
+        command:
+            - ${USERID:-1000}:${SFTP_PASSWORD:-password}:${USERID:-1000}:${GROUPID:-1000}
 
 networks:
     reseller:
