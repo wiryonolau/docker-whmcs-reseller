@@ -8,10 +8,13 @@ ENV CERT_PATH=/etc/nginx/certs \
     WORDPRESS_CERT_KEY_PATH= \
     WHMCS_SERVER_NAME=whmcs.test \
     WHMCS_CERT_PATH= \
-    WHMCS_CERT_KEY_PATH=
+    WHMCS_CERT_KEY_PATH= \
+    PMA_SERVER_NAME=pma.test \
+    PMA_CERT_PATH= \
+    PMA_CERT_KEY_PATH=
 
 RUN apt-get update \
-    && apt-get install -y wget openssl \
+    && apt-get install -y wget openssl inetutils-ping inetutils-telnet \
     && apt-get -y --purge autoremove \
     && apt-get -y clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*

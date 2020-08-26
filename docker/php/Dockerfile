@@ -4,7 +4,7 @@ FROM php:$IONCUBE_VERSION-fpm
 ARG IONCUBE_VERSION=7.2
 
 RUN apt-get update \
-    && apt-get install -y libpng-dev libjpeg-dev libc-client-dev libkrb5-dev zlib1g-dev libicu-dev g++ libcurl4-gnutls-dev libxml2-dev libldap2-dev libmemcached-dev libmcrypt-dev cron procps 
+    && apt-get install -y libpng-dev libjpeg-dev libc-client-dev libkrb5-dev zlib1g-dev libicu-dev g++ libcurl4-gnutls-dev libxml2-dev libldap2-dev libmemcached-dev libmcrypt-dev cron procps inetutils-ping inetutils-telnet
 
 # Memcached client
 RUN curl -L -o /tmp/memcached.tar.gz "https://github.com/php-memcached-dev/php-memcached/archive/php7.tar.gz" \

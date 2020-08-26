@@ -5,7 +5,7 @@ upstream whmcs {
 server {
     listen 443 ssl;
 
-    server_name {{ default .Env.WHMCS_SERVER_NAME "whmcs.dev" }};
+    server_name {{ default .Env.WHMCS_SERVER_NAME "whmcs.test" }};
     ssl_certificate {{ default .Env.WHMCS_CERT_PATH }};
     ssl_certificate_key {{ default .Env.WHMCS_CERT_KEY_PATH }};
 
