@@ -1,11 +1,11 @@
-upstream pma {
-    server pma:9000;
+upstream phpmyadmin {
+    server phpmyadmin:9000;
 }
 
 server {
     listen 443 ssl;
     
-    server_name {{ default .Env.PMA_SERVER_NAME "pma.test" }};
+    server_name {{ default .Env.PMA_SERVER_NAME "phpmyadmin.test" }};
     ssl_certificate {{ default .Env.PMA_CERT_PATH }};
     ssl_certificate_key {{ default .Env.PMA_CERT_KEY_PATH }};
 
@@ -36,7 +36,12 @@ server {
         access_log off;
     }
 
-    location ~* \.(ico|css|js)(\?[0-9]+)?$ {
+    location / {
+        try_files $uri $uri/ /index.php$is_args$args;
+    }
+
+    location ~* \.(jpg|jpeg|gif|css|png|js|ico|html|xml|txt)(\?[0-9]+)?$ {
+        root /srv/phpmyadmin;
         expires max;
         access_log off;
         add_header Pragma public;
@@ -46,7 +51,7 @@ server {
 
     location ~ \.php$ {
         fastcgi_index   index.php;
-        fastcgi_pass    pma;
+        fastcgi_pass    phpmyadmin;
         include         fastcgi_params;
         fastcgi_param   SCRIPT_FILENAME    $document_root$fastcgi_script_name;
         fastcgi_param   SCRIPT_NAME        $fastcgi_script_name;
