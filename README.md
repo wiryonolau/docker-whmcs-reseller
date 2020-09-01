@@ -50,8 +50,11 @@ USERID=$(id -u) GROUPID=$(id -g) SFTP_PASSWORD="mysftppassword" docker-compose u
 |phpmyadmin|php-fpm server for phpmyadmin, app located in ./app/phpmyadmin. Don't forget to set config manually|
 |cron|running php schedule job from file in ./app/cron|
 |mysql|mysql server using folder ./mysql_data
-|smtp|smtp server to send mail only. This is required so a sendmail request from application not run synchronusly. Can be set using gmail smtp. see configuration [here](https://hub.docker.com/r/namshi/smtp/)|
+|smtp|smtp server to send mail only. This is required so a sendmail request from application not run synchronusly. Can be set using gmail smtp. see configuration [here](https://hub.docker.com/r/namshi/smtp/).|
 |sftp|sftp server to access all folder inside ./app. See configuration [here](https://hub.docker.com/r/atmoz/sftp)|
+
+If you use smtp service without any option, it might not be able to send email due to blacklisted by real server. In case it is blocked, for development purpose you can create a gmail account ( without 2FA enable ), and pass the credential to GMAIL_USER and GMAIL_PASSWORD environment to the smtp service.
+
 
 ## Docker Environment Variable ##
 
@@ -59,13 +62,13 @@ USERID=$(id -u) GROUPID=$(id -g) SFTP_PASSWORD="mysftppassword" docker-compose u
 |Environemt|Required|Default Value|Info|
 |----|:----:|----|----|
 |CERT_PATH|Y|/etc/nginx/certs|Nginx Certificate folder path|
-|WORDPRESS_SERVER_NAME|Y|wordpress.test|Wordpress hostnames|
+|WORDPRESS_SERVER_NAME|Y|wordpress.test|Wordpress hostnames. Can be multiple name separated by single space e.g "wordpres.test www.wordpress.test" |
 |WORDPRESS_CERT_PATH|N||Wordpress certificate path|
 |WORDPRESS_CERT_KEY_PATH|N||Wordpress certificate key path|
-|WHMCS_SERVER_NAME|Y|whmcs.test|Whmcs hostnames|
+|WHMCS_SERVER_NAME|Y|whmcs.test|Whmcs hostnames. Can be multiple name separated by single space |
 |WHMCS_CERT_PATH|N||Whmcs certificate path|
 |WHMCS_CERT_KEY_PATH|N||Whmcs certificate key path|
-|PMA_SERVER_NAME|Y|pma.test|Phpmyadmin hostnames|
+|PMA_SERVER_NAME|Y|pma.test|Phpmyadmin hostnames. Can be multiple name separted by single space |
 |PMA_CERT_PATH|N||Phpmyadmin certificate path|
 |PMA_CERT_KEY_PATH|N||Phpmyadmin certificate key path|
 |SERVER_REAL_IP|Y||Container netowrk ip subnet use by nginx. Required for whmcs license|

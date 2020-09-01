@@ -6,7 +6,11 @@ services:
             context: ./docker/nginx
         image: nginx:whmcs-reseller
         networks:
-            - reseller
+            reseller:
+                aliases:
+                    - wordpress.test
+                    - whmcs.test
+                    - pma.test
         environment:
             - CERT_PATH=/etc/nginx/certs
             - WORDPRESS_SERVER_NAME=wordpress.test
@@ -37,9 +41,7 @@ services:
             context: ./docker/php
         image: php:7.2-whmcs-reseller
         networks:
-            reseller:
-                aliases:
-                    - whmcs.test
+            - reseller
         environment:
             - USERID=${USERID:-1000}
             - GROUPID=${GROUPID:-1000}
@@ -54,9 +56,7 @@ services:
             context: ./docker/php
         image: php:7.2-whmcs-reseller
         networks:
-            reseller:
-                aliases:
-                    - wordpress.test
+            - reseller
         environment:
             - USERID=${USERID:-1000}
             - GROUPID=${GROUPID:-1000}
@@ -71,9 +71,7 @@ services:
             context: ./docker/php
         image: php:7.2-whmcs-reseller
         networks:
-            reseller:
-                aliases:
-                    - pma.test
+            - reseller
         environment:
             - USERID=${USERID:-1000}
             - GROUPID=${GROUPID:-1000}
@@ -129,11 +127,12 @@ services:
         restart: unless-stopped
     smtp:
         image: namshi/smtp
-        hostname: mail.whmcs.com
         restart: unless-stopped
         networks:
             reseller:
                 ipv4_address: 172.16.254.8
+                aliases: 
+                    - smtp.test
     sftp:
         image: atmoz/sftp
         networks:
