@@ -22,7 +22,8 @@ services:
             - PMA_SERVER_NAME=pma.test
             - PMA_CERT_PATH=
             - PMA_CERT_KEY_PATH=
-            - SERVER_REAL_IP=172.16.254.0/24
+            - REAL_IP_FROM=172.16.0.0/12
+            - SERVER_ADDR=
         ports:
             - "80:80"
             - "443:443"
