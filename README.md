@@ -52,8 +52,10 @@ USERID=$(id -u) GROUPID=$(id -g) SFTP_PASSWORD="mysftppassword" docker-compose u
 |mysql|mysql server using folder ./mysql_data
 |smtp|smtp server to send mail only. This is required so a sendmail request from application not run synchronusly. Can be set using gmail smtp. see configuration [here](https://hub.docker.com/r/namshi/smtp/).|
 |sftp|sftp server to access all folder inside ./app. See configuration [here](https://hub.docker.com/r/atmoz/sftp)|
+|memcached|For caching purpose, make sure wordpress and whmcs use same session|
 
 If you use smtp service without any option, it might not be able to send email due to blacklisted by real server. In case it is blocked, for development purpose you can create a gmail account ( disable 2FA, enable Less Secure App ), and pass the credential to GMAIL_USER and GMAIL_PASSWORD environment in the smtp service.
+
 
 
 ## Docker Environment Variable ##
@@ -112,6 +114,9 @@ You need to change healthcheck --user and --password correspoding to above envir
 ## Docker Volume ##
 
 All volume are mandatory
+
+Wordpress, whmcs, and cron use the same custom php.ini file. If you need a separate php.ini file for each instance, create a separate file and change the mount volume path
+
 ### nginx ###
 |Source|Destination|Permission|Info|
 |----|----|:----:|----|
@@ -125,12 +130,14 @@ All volume are mandatory
 |Source|Destination|Permission|Info|
 |----|----|:----:|----|
 |./app/whmcs|/var/www/whmcs|RW|WHMCS app folder|
+|./app/php/php-fpm.ini|/usr/local/etc/php/conf.d/99_custom.ini|-|Custom PHP ini file|
 |/usr/share/zoneinfo/Asia/Jakarta|/etc/localtime|-|Container localtime|
 
 ### wordpress ###
 |Source|Destination|Permission|Info|
 |----|----|:----:|----|
 |./app/wordpress|/var/www/html|RW|Wordpress app folder|
+|./app/php/php-fpm.ini|/usr/local/etc/php/conf.d/99_custom.ini|-|Custom PHP ini file|
 |/usr/share/zoneinfo/Asia/Jakarta|/etc/localtime|-|Container localtime|
 
 ### phpmyadmin ###
@@ -145,6 +152,7 @@ All volume are mandatory
 |./app/cron|/cron|-|Cron job files. Will be merge and run as www-data|
 |./app/whmcs|/var/www/html/whmcs|-|For executing application script by cron|
 |./app/wordpress|/var/www/html/wordpress|-|For executing application script by cron|
+|./app/php/php-fpm.ini|/usr/local/etc/php/conf.d/99_custom.ini|-|Custom PHP ini file|
 |/usr/share/zoneinfo/Asia/Jakarta|/etc/localtime|-|Container localtime|
 
 ### mysql ###

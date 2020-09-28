@@ -48,10 +48,12 @@ services:
             - GROUPID=${GROUPID:-1000}
         volumes:
             - ./app/whmcs_data:/var/www/whmcs
+            - ./app/php/php-fpm.ini:/usr/local/etc/conf.d/99_custom.ini
             - /usr/share/zoneinfo/Asia/Jakarta:/etc/localtime
         restart: unless-stopped
         depends_on:
             - mysql
+            - memcached
     wordpress:
         build:
             context: ./docker/php
@@ -63,10 +65,12 @@ services:
             - GROUPID=${GROUPID:-1000}
         volumes:
             - ./app/wordpress:/var/www/html
+            - ./app/php/php-fpm.ini:/usr/local/etc/conf.d/99_custom.ini
             - /usr/share/zoneinfo/Asia/Jakarta:/etc/localtime
         restart: unless-stopped
         depends_on:
             - mysql
+            - memcached
     phpmyadmin:
         build:
             context: ./docker/php
@@ -95,12 +99,14 @@ services:
             - ./app/whmcs_data:/var/www/whmcs
             - ./app/wordpress:/var/www/html
             - ./app/cron:/cron
+            - ./app/php/php-fpm.ini:/usr/local/etc/conf.d/99_custom.ini
             - /usr/share/zoneinfo/Asia/Jakarta:/etc/localtime
         restart: unless-stopped
         command:
             - start-cron
         depends_on:
             - mysql
+            - memcached
     mysql:
         image: mysql:5.7
         user: ${USERID:-1000}:${GROUPID:-1000}
@@ -144,7 +150,12 @@ services:
             - "2222:22"
         command:
             - ${USERID:-1000}:${SFTP_PASSWORD:-password}:${USERID:-1000}:${GROUPID:-1000}
-
+     memcached:
+        image: memcached:alpine
+        restart: unless-stopped
+        networks:
+            - reseller
+    
 networks:
     reseller:
         driver: bridge
