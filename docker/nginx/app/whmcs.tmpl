@@ -8,6 +8,7 @@ server {
     server_name {{ default .Env.WHMCS_SERVER_NAME "whmcs.test" }};
     ssl_certificate {{ default .Env.WHMCS_CERT_PATH }};
     ssl_certificate_key {{ default .Env.WHMCS_CERT_KEY_PATH }};
+    ssl_protocols TLSv1.1 TLSv1.2;
 
     root   /var/www/whmcs;
     index  index.php index.html;

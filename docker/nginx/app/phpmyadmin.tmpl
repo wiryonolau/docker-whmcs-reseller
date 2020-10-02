@@ -8,6 +8,7 @@ server {
     server_name {{ default .Env.PMA_SERVER_NAME "phpmyadmin.test" }};
     ssl_certificate {{ default .Env.PMA_CERT_PATH }};
     ssl_certificate_key {{ default .Env.PMA_CERT_KEY_PATH }};
+    ssl_protocols TLSv1.1 TLSv1.2;
 
     root /var/www/html;
     index index.php index.html;
