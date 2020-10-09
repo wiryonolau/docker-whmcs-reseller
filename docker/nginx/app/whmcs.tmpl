@@ -43,7 +43,7 @@ server {
         fastcgi_param   SCRIPT_FILENAME    $document_root$fastcgi_script_name;
         fastcgi_param   SCRIPT_NAME        $fastcgi_script_name;
         {{ if .Env.SERVER_ADDR }}
-        fastcgi_param   SERVER_ADDR        {{ default .ENV.SERVER_ADDR }}
+        fastcgi_param   SERVER_ADDR        {{ default .ENV.SERVER_ADDR }};
         {{ end }}
         fastcgi_param   HTTPS              on;
         fastcgi_keep_conn on;
