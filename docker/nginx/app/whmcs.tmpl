@@ -37,6 +37,17 @@ server {
     proxy_hide_header X-Powered-By;
  
     location / {
+        # Fix whmcs bridge unable to reset password
+        # Basic URL Rewrite only
+        if ($args ~* "rp=/password/reset/redeem") {
+            set $delimeter "&";
+            set $args "${args}${delimeter}ccce=index";
+            {{ range $i, $name := split .Env.WORDPRESS_SERVER_NAME " " }}
+            {{ if eq $i 0 }}
+            rewrite ^(.*)$ https://{{ $name }}/clientarea/ permanent;
+            {{ end }}
+            {{ end }}
+        }
         try_files $uri $uri/ /index.php$is_args$args;
     }
     
@@ -51,7 +62,7 @@ server {
         fastcgi_param   SCRIPT_FILENAME    $document_root$fastcgi_script_name;
         fastcgi_param   SCRIPT_NAME        $fastcgi_script_name;
         {{ if .Env.SERVER_ADDR }}
-        fastcgi_param   SERVER_ADDR        {{ default .ENV.SERVER_ADDR }};
+        fastcgi_param   SERVER_ADDR        {{ default .Env.SERVER_ADDR }};
         {{ end }}
         fastcgi_param   HTTPS              on;
         fastcgi_keep_conn on;
@@ -62,7 +73,7 @@ server {
         return 405;
     }
 
-    location ~* \.(css|js|png|jpe?g|gif|ico|woff|otf|ttf|eot|svg|txt|pdf|docx?|xlsx?)$ {
+    location ~* \.(css|js|png|jpe?g|gif|ico|woff|woff2|otf|ttf|eot|svg|txt|pdf|docx?|xlsx?)$ {
         root /srv/whmcs;
         expires max;
         access_log off;
@@ -85,3 +96,4 @@ server {
         deny all;
     }
 }
+
