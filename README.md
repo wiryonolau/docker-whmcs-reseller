@@ -40,6 +40,9 @@ In case your user id or group id is not 1000, you need to set USERID and GROUPID
 USERID=$(id -u) GROUPID=$(id -g) SFTP_PASSWORD="mysftppassword" docker-compose up -d
 ```
 
+php-ssh has ssh and sftp function, if you use this service then disable the sftp service.
+php-ssh and sftp are optional and best to be disable during production for security. 
+
 ## Docker Service ##
 
 |Service|Function|
@@ -52,6 +55,7 @@ USERID=$(id -u) GROUPID=$(id -g) SFTP_PASSWORD="mysftppassword" docker-compose u
 |mysql|mysql server using folder ./mysql_data
 |smtp|smtp server to send mail only. This is required so a sendmail request from application not run synchronusly. Can be set using gmail smtp. see configuration [here](https://hub.docker.com/r/namshi/smtp/).|
 |sftp|sftp server to access all folder inside ./app. See configuration [here](https://hub.docker.com/r/atmoz/sftp)|
+|php-ssh|php-fpm with ssh server and sftp server for debugging|
 |memcached|For caching purpose, make sure wordpress and whmcs use same session|
 
 If you use smtp service without any option, it might not be able to send email due to blacklisted by real server. In case it is blocked, for development purpose you can create a gmail account ( disable 2FA, enable Less Secure App ), and pass the credential to GMAIL_USER and GMAIL_PASSWORD environment in the smtp service.
@@ -70,6 +74,7 @@ If you use smtp service without any option, it might not be able to send email d
 |WHMCS_SERVER_NAME|Y|whmcs.test|Whmcs hostnames. Can be multiple name separated by single space |
 |WHMCS_CERT_PATH|N||Whmcs certificate path|
 |WHMCS_CERT_KEY_PATH|N||Whmcs certificate key path|
+|WHMCS_BRIDGE_URL|Y|Full url path of whmcs bridge page in wordpress, required for password reset|
 |PMA_SERVER_NAME|Y|pma.test|Phpmyadmin hostnames. Can be multiple name separted by single space |
 |PMA_CERT_PATH|N||Phpmyadmin certificate path|
 |PMA_CERT_KEY_PATH|N||Phpmyadmin certificate key path|
@@ -110,6 +115,16 @@ Check [here](https://hub.docker.com/_/mysql) for other option
 |MYSQL_PASSWORD|Y|888888|MySQL application user password|
 
 You need to change healthcheck --user and --password correspoding to above environment
+
+### php-ssh ###
+
+|Environemt|Required|Default Value|Info|
+|----|:----:|----|----|
+|SSH_USERS|Y||SSH user and permission, format: <username>:<uid>:<gid>:<shell>|
+|SSH_ENABLE_PASSWORD_AUTH|N|true|Using password to login|
+|SFTP_CHROOT|N||To Chroot user to specific folder when accessing using sftp|
+
+Enabling password auth require creating and mounting setpasswd.sh file, Check in the Volume section of php-ssh
 
 ## Docker Volume ##
 
@@ -166,6 +181,22 @@ Wordpress, whmcs, and cron use the same custom php.ini file. If you need a separ
 |Source|Destination|Permission|Info|
 |----|----|:----:|----|
 |./app|/home/${USERID:-1000}/upload|-|Manage whole application file from ftp|
+
+### php-ssh ###
+|Source|Destination|Permission|Info|
+|----|----|:----:|----|
+|./app|/app|-|Manange whole application file from ftp|
+|./setpasswd.sh|/etc/entrypoint.d/setpasswd.sh|ro|SSH Password File|
+|/usr/share/zoneinfo/Asia/Jakarta|/etc/localtime|-|Container localtime|
+
+To login using password create a file setpasswd.sh, make it executable and paste below code
+```bash
+#!/usr/bin/env bash
+set -e
+
+echo "user:pass" | chpasswd
+```
+Then mount the file to /etc/entrypoint.d/setpasswd.sh
 
 ## Unsupported Feature ##
 - We do not plan to implement mail server here, due to complexity of managing mail server security such as spam.

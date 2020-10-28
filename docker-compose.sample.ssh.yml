@@ -141,16 +141,25 @@ services:
                 ipv4_address: 172.16.254.8
                 aliases: 
                     - smtp.test
-    sftp:
-        image: atmoz/sftp
+     php-ssh:
+        build:
+            context: ./docker/php-ssh
+        image: php:7.2-whmcs-reseller-ssh
         networks:
-            - reseller
-        volumes:
-            - ./app:/home/${USERID:-1000}/upload
+            reseller:
         ports:
             - "2222:22"
-        command:
-            - ${USERID:-1000}:${SFTP_PASSWORD:-password}:${USERID:-1000}:${GROUPID:-1000}
+        environment:
+            - SSH_USERS=user:1000:1000:/bin/bash
+            - SSH_ENABLE_PASSWORD_AUTH=true
+        volumes:
+            - ./app:/app
+            - ./setpasswd.sh:/etc/entrypoint.d/setpasswd.sh:ro
+            - /usr/share/zoneinfo/Asia/Jakarta:/etc/localtime
+        restart: unless-stopped
+        depends_on:
+            - mysql
+            - memcached
      memcached:
         image: memcached:alpine
         restart: unless-stopped
