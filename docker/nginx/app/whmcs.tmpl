@@ -35,19 +35,16 @@ server {
     # Hide PHP Version
     fastcgi_hide_header X-Powered-By;
     proxy_hide_header X-Powered-By;
+
+    # Fix whmcs bridge unable to reset password
+    # Basic URL Rewrite only
+    if ($args ~ "rp=/password/reset/redeem/[a-z0-9]+") {
+        set $delimeter "&";
+        set $args "${args}${delimeter}ccce=index";
+        rewrite ^/(.*)$ {{ default .Env.WHMCS_BRIDGE_URL }} permanent;
+    }
  
     location / {
-        # Fix whmcs bridge unable to reset password
-        # Basic URL Rewrite only
-        if ($args ~* "rp=/password/reset/redeem") {
-            set $delimeter "&";
-            set $args "${args}${delimeter}ccce=index";
-            {{ range $i, $name := split .Env.WORDPRESS_SERVER_NAME " " }}
-            {{ if eq $i 0 }}
-            rewrite ^(.*)$ https://{{ $name }}/clientarea/ permanent;
-            {{ end }}
-            {{ end }}
-        }
         try_files $uri $uri/ /index.php$is_args$args;
     }
     
