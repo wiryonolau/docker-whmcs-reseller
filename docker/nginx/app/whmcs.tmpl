@@ -70,6 +70,11 @@ server {
         return 405;
     }
 
+    location ^~ /vendor/ {
+        deny all;
+        return 403;
+    }
+
     location ~* \.(css|js|png|jpe?g|gif|ico|woff|woff2|otf|ttf|eot|svg|txt|pdf|docx?|xlsx?)$ {
         root /srv/whmcs;
         expires max;

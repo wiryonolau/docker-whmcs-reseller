@@ -69,7 +69,7 @@ server {
         fastcgi_param   HTTPS              on;
         {{ if .Env.SERVER_ADDR }} 
         fastcgi_param   SERVER_ADDR {{ default .Env.SERVER_ADDR }};
-        {{ endif }}
+        {{ end }}
         fastcgi_keep_conn on;
         fastcgi_intercept_errors on;
     }
