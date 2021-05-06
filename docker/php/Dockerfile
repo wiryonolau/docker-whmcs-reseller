@@ -4,10 +4,19 @@ FROM php:$IONCUBE_VERSION-fpm
 ARG IONCUBE_VERSION=7.2
 
 RUN apt-get update \
-    && apt-get install -y libpng-dev libjpeg-dev libc-client-dev libkrb5-dev zlib1g-dev libicu-dev g++ libcurl4-gnutls-dev libxml2-dev libldap2-dev libmemcached-dev libmcrypt-dev cron procps inetutils-ping inetutils-telnet
+    && apt-get install -y libpng-dev libjpeg-dev libc-client-dev libkrb5-dev zlib1g-dev libicu-dev g++ libcurl4-gnutls-dev libxml2-dev libldap2-dev libmagickwand-dev libmemcached-dev libmcrypt-dev libonig-dev libzip-dev cron procps inetutils-ping inetutils-telnet
+
+# Enable ioncube
+RUN curl -o /tmp/ioncube.tar.gz https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz \
+    && tar -xzvf /tmp/ioncube.tar.gz -C /tmp \
+    && mkdir -p /usr/local/lib/php/ioncube \
+    && cp "/tmp/ioncube/ioncube_loader_lin_${IONCUBE_VERSION}.so" /usr/local/lib/php/ioncube/. \
+    && echo "zend_extension = /usr/local/lib/php/ioncube/ioncube_loader_lin_$IONCUBE_VERSION.so" > /usr/local/etc/php/conf.d/00_ioncube.ini \
+    && rm -r /tmp/ioncube \
+    && rm /tmp/ioncube.tar.gz 
 
 # Memcached client
-RUN curl -L -o /tmp/memcached.tar.gz "https://github.com/php-memcached-dev/php-memcached/archive/php7.tar.gz" \
+RUN curl -L -o /tmp/memcached.tar.gz "https://github.com/php-memcached-dev/php-memcached/archive/refs/tags/v3.1.5.tar.gz" \
     && mkdir -p /tmp/memcached \
     && tar -C /tmp/memcached -zxvf /tmp/memcached.tar.gz --strip 1 \
     && ( \
@@ -20,14 +29,10 @@ RUN curl -L -o /tmp/memcached.tar.gz "https://github.com/php-memcached-dev/php-m
     && rm -r /tmp/memcached  \
     && rm /tmp/memcached.tar.gz
 
-# Enable ioncube
-RUN curl -o /tmp/ioncube.tar.gz https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz \
-    && tar -xzvf /tmp/ioncube.tar.gz -C /tmp \
-    && mkdir -p /usr/local/lib/php/ioncube \
-    && cp "/tmp/ioncube/ioncube_loader_lin_${IONCUBE_VERSION}.so" /usr/local/lib/php/ioncube/. \
-    && echo "zend_extension = /usr/local/lib/php/ioncube/ioncube_loader_lin_$IONCUBE_VERSION.so" > /usr/local/etc/php/conf.d/00_ioncube.ini \
-    && rm -r /tmp/ioncube \
-    && rm /tmp/ioncube.tar.gz 
+# Install imagick
+RUN pecl channel-update pecl.php.net \
+    && printf "\n" | pecl install imagick \ 
+    && rm -r /tmp/pear
 
 RUN docker-php-ext-configure imap --with-kerberos --with-imap-ssl \
     && docker-php-ext-install imap \
@@ -46,8 +51,10 @@ RUN docker-php-ext-configure imap --with-kerberos --with-imap-ssl \
     && docker-php-ext-install iconv \
     && docker-php-ext-install soap \
     && docker-php-ext-enable memcached \
+    && docker-php-ext-enable imagick \
     && apt-get purge -y libc-client-dev libkrb5-dev libicu-dev g++ libcurl4-gnutls-dev libxml2-dev libldap2-dev \  
     && apt-get -y --purge autoremove \
+    && apt-get install -y --no-install-recommends libmagickwand-6.q16-6:amd64 \
     && apt-get -y clean \
     && rm -rf /var/lib/apt/list/* /tmp/* /var/tmp/*
 
