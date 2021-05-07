@@ -36,6 +36,7 @@ server {
     fastcgi_hide_header X-Powered-By;
     proxy_hide_header X-Powered-By;
 
+    {{ if .Env.WHMCS_BRIDGE_URL }}
     # Fix whmcs bridge unable to reset password
     # Basic URL Rewrite only
     if ($args ~ "rp=/password/reset/redeem/[a-z0-9]+") {
@@ -43,6 +44,7 @@ server {
         set $args "${args}${delimeter}ccce=index";
         rewrite ^/(.*)$ {{ default .Env.WHMCS_BRIDGE_URL }} permanent;
     }
+    {{ end }}
  
     location / {
         try_files $uri $uri/ /index.php$is_args$args;
